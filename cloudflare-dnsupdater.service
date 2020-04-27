@@ -1,0 +1,14 @@
+[Unit]
+Description=CloudFlare DNS Updater
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/cloudflare/
+ExecStart=/cloudflare/CFDNSUpdater.py
+Restart=no
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
