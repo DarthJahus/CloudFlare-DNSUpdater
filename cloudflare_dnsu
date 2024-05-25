@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# PROVIDE: cloudflare_dnsu
+# REQUIRE: DAEMON
+# KEYWORD: shutdown
+
+. /etc/rc.subr
+
+name="cloudflare_dnsu"
+rcvar="cloudflare_dnsu_enable"
+
+start_cmd="${name}_start"
+stop_cmd=":"
+
+cloudflare_dnsu_start()
+{
+    cd /root/CloudFlare-DNSUpdater
+    /usr/local/bin/python3 CFDNSUpdater.py &
+}
+
+load_rc_config $name
+run_rc_command "$1"

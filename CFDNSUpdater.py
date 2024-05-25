@@ -3,7 +3,7 @@
 import requests
 import json
 
-__providers = ["https://api.ipify.org/", "https://ident.me"]
+__providers = ["https://icanhazip.com", "https://api.ipify.org/", "https://ident.me"]
 __token = None
 __data = None
 
@@ -31,13 +31,13 @@ if _ext_ip:
 	print("External IP: %s" % _ext_ip)
 else:
 	print("ERROR: Failed to get external IP.")
-	exit()
+	exit(1)
 
 # Set new IP for zone
 
 if not __data:
 	print("Token file not found in script folder.")
-	exit()
+	exit(1)
 
 # Get zones
 
@@ -59,7 +59,7 @@ if _req.status_code != 200:
 	if "errors" in _req.json():
 		for _error in _req.json()["errors"]:
 			print(_error)
-	exit()
+	exit(1)
 # Get record data
 _req_json = _req.json()
 _record_data = None
@@ -72,7 +72,7 @@ for _record in _req_json["result"]:
 		break
 if not _record_data:
 	print("Something went wrong while retrieving domain record data.")
-	exit()
+	exit(1)
 # Update record
 _req = requests.patch(
 	"https://api.cloudflare.com/client/v4/zones/%s/dns_records/%s" % (__data["zone-id"], _record_data["id"]),
@@ -90,20 +90,21 @@ if _req.status_code != 200:
 	if "errors" in _req.json():
 		for _error in _req.json()["errors"]:
 			print(_error)
-	exit()
+	exit(1)
 # Get answer
 _req_json = _req.json()
 if not _req_json["success"]:
 	print("Error while updating domain record.")
 	for _error in _req_json["errors"]:
 		print(_error)
-	exit()
+	exit(1)
 if _record_data["id"] != _req_json["result"]["id"]:
 	print("Something went wrong while trying to update domain record (ID mismatch).")
-	exit()
+	exit(1)
 else:
 	if _req_json["result"]["content"] != _ext_ip:
 		print("Domain record failed to update to new IP (IP mismatch).")
-		exit()
+		exit(1)
 	else:
 		print("New IP %s correctly set for record %s" % (_ext_ip, __data["domain"]))
+		exit(0)
