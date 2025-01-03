@@ -22,7 +22,7 @@ _ext_ip = None
 for _provider in __providers:
 	try:
 		_request = requests.get(_provider)
-		_ext_ip = _request.content.decode('utf8')
+		_ext_ip = _request.content.decode('utf8').strip()
 		break
 	except:
 		print("ERROR: Provider %s unreachable" % _provider)
@@ -103,7 +103,7 @@ if _record_data["id"] != _req_json["result"]["id"]:
 	exit(1)
 else:
 	if _req_json["result"]["content"] != _ext_ip:
-		print("Domain record failed to update to new IP (IP mismatch).")
+		print("Domain record failed to update to new IP (IP mismatch: %s vs ext:%s)." % (_req_json["result"]["content"], _ext_ip))
 		exit(1)
 	else:
 		print("New IP %s correctly set for record %s" % (_ext_ip, __data["domain"]))
